@@ -1,0 +1,1 @@
+#include "broadcasters/StaticFramePublisher.hpp"
