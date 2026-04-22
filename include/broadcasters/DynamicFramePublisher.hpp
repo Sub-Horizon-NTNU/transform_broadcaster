@@ -24,8 +24,6 @@ class DynamicFramePublisher{
         child_(child),
         x_translation_(x),y_translation_(y),z_translation_(z)
     {
-        // X IS FWD  Z UP, LEFT CAMERA 
-        //transform_rotation.setRPY(0.0, 0.0, -M_PI / 2.0);
         transform_rotation.setRPY(roll, pitch, yaw);
         tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(node_);
         //USV
@@ -42,7 +40,7 @@ class DynamicFramePublisher{
         orientation.normalize();
 
         geometry_msgs::msg::TransformStamped usv_transform;
-        usv_transform.header.stamp = pose->header.stamp;
+        usv_transform.header.stamp = node_->now();
         usv_transform.header.frame_id = parent_;
         usv_transform.child_frame_id = child_;
         usv_transform.transform.rotation.x = orientation.x();
@@ -53,7 +51,6 @@ class DynamicFramePublisher{
         usv_transform.transform.translation.y =  pose->pose.position.x + y_translation_;
         usv_transform.transform.translation.z = -pose->pose.position.z + z_translation_;
         tf_broadcaster_->sendTransform(usv_transform);
-        //publish_camera_pose(usv_transform);
     }
 
    

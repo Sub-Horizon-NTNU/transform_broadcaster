@@ -1,5 +1,4 @@
 
-from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
@@ -7,9 +6,9 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     #Camera used Z UP, X FWD
-    camera_offset_x_arg = DeclareLaunchArgument('camera_offset_x',description='camera coordinates (left) relative to USV NED')
-    camera_offset_y_arg = DeclareLaunchArgument('camera_offset_y',description='camera coordinates (left) relative to USV NED')
-    camera_offset_z_arg = DeclareLaunchArgument('camera_offset_z',description='camera coordinates (left) relative to USV NED')
+    camera_offset_x_arg = DeclareLaunchArgument('camera_offset_x',default_value='0.0',description='camera coordinates (left) relative to USV NED')
+    camera_offset_y_arg = DeclareLaunchArgument('camera_offset_y',default_value='0.0',description='camera coordinates (left) relative to USV NED')
+    camera_offset_z_arg = DeclareLaunchArgument('camera_offset_z',default_value='0.0',description='camera coordinates (left) relative to USV NED')
 
     
     model_arg = DeclareLaunchArgument('model',default_value='best.onnx',description='Select which model to use. e.g: best.onnx')
