@@ -10,12 +10,14 @@
 #include <geometry_msgs/msg/detail/transform_stamped__struct.hpp>
 #include <rclcpp/create_publisher.hpp>
 #include <rclcpp/qos.hpp>
+#include <tf2/LinearMath/Matrix3x3.hpp>
 #include <tf2/LinearMath/Quaternion.hpp>
 #include <tf2/convert.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 
 class DynamicFramePublisher{
+    //TODO: decouple class from the /ap topic
     public:
     DynamicFramePublisher(rclcpp::Node::SharedPtr node,std::string parent, std::string child,
     const double x,const double y,const double z,const double roll, const double pitch, const double yaw) 
@@ -24,7 +26,15 @@ class DynamicFramePublisher{
         child_(child),
         x_translation_(x),y_translation_(y),z_translation_(z)
     {
-        transform_rotation.setRPY(roll, pitch, yaw);
+        
+         tf2::Matrix3x3 R_enu_ned(
+            0, 1, 0,
+            1, 0, 0,
+            0, 0, -1
+        );
+        R_enu_ned.getRotation(transform_rotation);
+        transform_rotation.normalize();
+
         tf_broadcaster_ =std::make_unique<tf2_ros::TransformBroadcaster>(node_);
         //USV
         subscription_ = node_->create_subscription<geometry_msgs::msg::PoseStamped>(
@@ -36,9 +46,10 @@ class DynamicFramePublisher{
         //ENU to NED
         tf2::Quaternion orientation;
         tf2::fromMsg(pose->pose.orientation,orientation);
-        orientation = orientation * transform_rotation;
+        
+        orientation = transform_rotation * orientation;
         orientation.normalize();
-
+    
         geometry_msgs::msg::TransformStamped usv_transform;
         usv_transform.header.stamp = node_->now();
         usv_transform.header.frame_id = parent_;
@@ -46,10 +57,10 @@ class DynamicFramePublisher{
         usv_transform.transform.rotation.x = orientation.x();
         usv_transform.transform.rotation.y = orientation.y();
         usv_transform.transform.rotation.z = orientation.z();
-        usv_transform.transform.rotation.w = -orientation.w();
-        usv_transform.transform.translation.x =  pose->pose.position.y + x_translation_;
-        usv_transform.transform.translation.y =  pose->pose.position.x + y_translation_;
-        usv_transform.transform.translation.z = -pose->pose.position.z + z_translation_;
+        usv_transform.transform.rotation.w = orientation.w();
+        usv_transform.transform.translation.x =  pose->pose.position.y; //+ x_translation_;
+        usv_transform.transform.translation.y =  pose->pose.position.x; //+ y_translation_;
+        usv_transform.transform.translation.z = -pose->pose.position.z; //+ z_translation_;
         tf_broadcaster_->sendTransform(usv_transform);
     }
 
