@@ -10,7 +10,7 @@ class TransformBroadcasterNode: public rclcpp::Node{
     TransformBroadcasterNode(): Node("transform_broadcaster") {}
 
     void init(){
-        this->declare_parameter("camera_offset_x",0.2);
+        this->declare_parameter("camera_offset_x",0.41);
         this->declare_parameter("camera_offset_y",0.0);
         this->declare_parameter("camera_offset_z",-0.1);
 
@@ -25,13 +25,13 @@ class TransformBroadcasterNode: public rclcpp::Node{
         );
 
         dynamic_frame_publisher_ = std::make_unique<DynamicFramePublisher>(
-            this->shared_from_this(),"world_ned","usv_ned",0.0,0.0,0.0,0.0, 0.0, 0.0
+            this->shared_from_this(),"world_ned","usv_ned",-0.47,+0.31,-0.2,0.3, 0.0, 0.0
         );
 
         //Transformation between usv (NED) and camera (Z_UP X_FWD)
         static_frame_publisher_2 = std::make_unique<StaticFramePublisher>(
             this->shared_from_this(),
-            "usv_ned","camera",0.2,0.2,0.0,M_PI,0.0,0.0
+            "usv_ned","camera",0.41,-0.06,0.0,M_PI,0.0,0.0
         );
         RCLCPP_INFO(this->get_logger(),"Tranform broadcaster started");
     }
