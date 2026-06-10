@@ -12,6 +12,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(px4_msgs REQUIRED)
 
 add_executable(transform_broadcaster src/main.cpp
   src/TransformBroadcasterNode.cpp
@@ -25,6 +26,7 @@ ament_target_dependencies(transform_broadcaster
     tf2
     tf2_ros
     tf2_geometry_msgs
+    px4_msgs
 )
 
 install(TARGETS transform_broadcaster
